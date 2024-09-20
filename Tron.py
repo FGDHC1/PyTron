@@ -128,9 +128,9 @@ def playerdead():
         playerdeath = True
 
     #border collision
-    if player1pos[0] < 0 or player1pos[0] > width or player1pos[1] < 0 or player1pos[1] > height-1 :
+    if player1pos[0] < 0 or player1pos[0] > width-1 or player1pos[1] < 0 or player1pos[1] > height-1 :
         playerdeath = True
-    if player2pos[0] < 0 or player2pos[0] > width or player2pos[1] < 0 or player2pos[1] > height-1 :
+    if player2pos[0] < 0 or player2pos[0] > width-1 or player2pos[1] < 0 or player2pos[1] > height-1 :
         playerdeath = True
 
 
