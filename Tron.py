@@ -1,6 +1,7 @@
 import pygame
 import sys
-from time import sleep
+import copy
+
 
 
 pygame.init()
@@ -40,11 +41,11 @@ def playerreset():
     global player1dir,player2dir, player1poshistory, player2poshistory, player1pos, player2pos, playerdeath
     player1pos = [width // 4, height // 2]
     player1dir = pygame.K_RIGHT
-    player1poshistory = [player1pos[:]]
+    player1poshistory = [player1pos.copy()]
 
     player2pos = [width // 4 * 3, height // 2]
     player2dir = pygame.K_a
-    player2poshistory = [player2pos[:]]
+    player2poshistory = [player2pos.copy()]
 
     playerdeath=False
 
@@ -75,10 +76,10 @@ def player1movement():
         player1pos[1] += playerspeed
 
 
-    if len(player1poshistory) > 2 and player1pos[:] == player1poshistory[0]:
-        break
+    if len(player1poshistory) == 1 and player1pos == player1poshistory[0]:
+        pass
     else:
-        player1poshistory.append(player1pos[:])
+        player1poshistory.append(player1pos.copy())
 
 def player2movement():
     global player2poshistory, player2dir, player2pos
@@ -93,6 +94,7 @@ def player2movement():
     elif pressedkey[pygame.K_DOWN] and player2dir!=pygame.K_UP:
         player2dir = pygame.K_DOWN
 
+
     if player2dir==pygame.K_RIGHT:
         player2pos[0] += playerspeed
     elif player2dir==pygame.K_LEFT:
@@ -102,19 +104,34 @@ def player2movement():
     elif player2dir==pygame.K_DOWN:
         player2pos[1] += playerspeed
 
-    if len(player2poshistory) > 2 and player2pos[:] == player2poshistory[0]:
-        break
+    if len(player2poshistory) == 1 and player2pos == player2poshistory[0]:
+        pass
     else:
-        player2poshistory.append(player2pos[:])
+        player2poshistory.append(player2pos.copy())
 def drawpath():
-        for pos in player1poshistory:
-            pygame.draw.rect(display, orange, pygame.Rect(pos[0], pos[1], playerwidth, playerwidth))
-        for pos in player2poshistory:
-            pygame.draw.rect(display, blue, pygame.Rect(pos[0], pos[1], playerwidth, playerwidth))
+        for pos1 in player1poshistory:
+            pygame.draw.rect(display, orange, pygame.Rect(pos1[0], pos1[1], playerwidth, playerwidth))
+        for pos2 in player2poshistory:
+            pygame.draw.rect(display, blue, pygame.Rect(pos2[0], pos2[1], playerwidth, playerwidth))
 
 def playerdead():
     global playerdeath
-    if player1pos
+    #player collision
+    if player1pos in player2poshistory:
+        playerdeath = True
+    if player1pos in player1poshistory[:-1]:
+        playerdeath = True
+
+    if player2pos in player2poshistory[:-1]:
+        playerdeath = True
+    if player2pos in player1poshistory:
+        playerdeath = True
+
+    #border collision
+    if player1pos[0] < 0 or player1pos[0] > width or player1pos[1] < 0 or player1pos[1] > height :
+        playerdeath = True
+    if player2pos[0] < 0 or player2pos[0] > width or player2pos[1] < 0 or player2pos[1] > height :
+        playerdeath = True
 
 
 playerreset()
@@ -131,8 +148,8 @@ while running:
     drawpath()
     playerdead()
 
-    # if playerdeath:
-    #     playerreset()
+    if playerdeath:
+        playerreset()
 
 
 
@@ -142,4 +159,4 @@ while running:
 pygame.quit()
 sys.exit()
 
-#test
+#
