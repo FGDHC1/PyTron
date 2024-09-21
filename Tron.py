@@ -21,8 +21,10 @@ pygame.mouse.set_visible(False)
 
 clock = pygame.time.Clock()
 
-player1name="player1:"
-player2name="player2:"
+player1name="player1"
+player2name="player2"
+player1score=0
+player2score=0
 
 def retrogrid (surface, gridcolor, gridsize):
     for x in range(0, width, gridsize):
@@ -118,38 +120,49 @@ def drawpath():
             pygame.draw.rect(display, blue, pygame.Rect(pos2[0], pos2[1], playerwidth, playerwidth))
 
 def playerdead():
-    global playerdeath
+    global playerdeath,player1score,player2score
     #player collision
     if player1pos in player2poshistory:
         playerdeath = True
+        player2score += 1
     if player1pos in player1poshistory[:-1]:
         playerdeath = True
+        player2score += 1
+
 
     if player2pos in player2poshistory[:-1]:
         playerdeath = True
+        player1score += 1
     if player2pos in player1poshistory:
         playerdeath = True
+        player1score += 1
+
 
     #border collision
     if player1pos[0] < 0 or player1pos[0] > width-1 or player1pos[1] < 0 or player1pos[1] > height-1 :
         playerdeath = True
+        player2score += 1
     if player2pos[0] < 0 or player2pos[0] > width-1 or player2pos[1] < 0 or player2pos[1] > height-1 :
         playerdeath = True
+        player1score += 1
 
 def playernames():
-    global player1name, player2name
+    global player1name, player2name,player1score,player2score
+    player1out = player1name+": "+str(player1score)
+    player2out = player2name+": "+str(player2score)
     #player2
     font=pygame.font.SysFont('Aptos',30)
-    textp1=font.render(player1name,True,orange)
+    textp1=font.render(player1out,True,orange)
     textRectp1=textp1.get_rect()
     textRectp1.center=50,15
     display.blit(textp1,textRectp1)
     #player2
     font = pygame.font.SysFont('Aptos', 30)
-    textp2 = font.render(player2name, True, blue)
+    textp2 = font.render(player2out, True, blue)
     textRectp2 = textp2.get_rect()
     textRectp2.center = 50, 40
     display.blit(textp2, textRectp2)
+
 playerreset()
 running = True
 while running:
@@ -162,7 +175,7 @@ while running:
     player1movement()
     player2movement()
     drawpath()
-    playerdead()
+    playerdead() 
     playernames()
 
     if playerdeath:
@@ -171,7 +184,7 @@ while running:
 
 
     pygame.display.update()
-    clock.tick(15)
+    clock.tick(10)
 
 pygame.quit()
 sys.exit()
