@@ -21,6 +21,9 @@ pygame.mouse.set_visible(False)
 
 clock = pygame.time.Clock()
 
+player1name="player1:"
+player2name="player2:"
+
 def retrogrid (surface, gridcolor, gridsize):
     for x in range(0, width, gridsize):
         pygame.draw.line(surface, gridcolor, (x,0), (x,height))
@@ -133,7 +136,20 @@ def playerdead():
     if player2pos[0] < 0 or player2pos[0] > width-1 or player2pos[1] < 0 or player2pos[1] > height-1 :
         playerdeath = True
 
-
+def playernames():
+    global player1name, player2name
+    #player2
+    font=pygame.font.SysFont('Aptos',30)
+    textp1=font.render(player1name,True,orange)
+    textRectp1=textp1.get_rect()
+    textRectp1.center=50,15
+    display.blit(textp1,textRectp1)
+    #player2
+    font = pygame.font.SysFont('Aptos', 30)
+    textp2 = font.render(player2name, True, blue)
+    textRectp2 = textp2.get_rect()
+    textRectp2.center = 50, 40
+    display.blit(textp2, textRectp2)
 playerreset()
 running = True
 while running:
@@ -147,6 +163,7 @@ while running:
     player2movement()
     drawpath()
     playerdead()
+    playernames()
 
     if playerdeath:
         playerreset()
@@ -159,4 +176,4 @@ while running:
 pygame.quit()
 sys.exit()
 
-#
+#Quelllen: Pygame documentation, Stackoverflow, Geeks for geeks
