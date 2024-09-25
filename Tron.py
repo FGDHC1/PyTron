@@ -12,12 +12,14 @@ orange=(255,90,0)
 blue=(50,50,255)
 grey=(127,127,127)
 purple=(127,0,127)
+green=(0,255,0)
+red=(255,0,0)
 
 width, height=800,500
 
 display = pygame.display.set_mode((width,height))
 pygame.display.set_caption('PyTron')
-pygame.mouse.set_visible(False)
+pygame.mouse.set_visible(True)
 
 clock = pygame.time.Clock()
 
@@ -25,6 +27,7 @@ player1name="player1"
 player2name="player2"
 player1score=0
 player2score=0
+
 
 def retrogrid (surface, gridcolor, gridsize):
     for x in range(0, width, gridsize):
@@ -37,9 +40,15 @@ background = background.convert()
 background.fill(black)
 retrogrid(background, purple, 40)
 
+def drawbackground():
+    global background
+    background.fill(black)
+    retrogrid(background, purple, 40)
+
 playerwidth=10
 playerspeed=10
 playerdeath=False
+paused=False
 
 
 def playerreset():
@@ -163,20 +172,43 @@ def playernames():
     textRectp2.center = 50, 40
     display.blit(textp2, textRectp2)
 
+def pause():
+    global background, paused
+
+    background.fill(white)
+    pygame.display.update()
+    while paused:
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    paused = False
+
+    # background.fill(black)
+    # retrogrid(background, purple, 40)
+
 playerreset()
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running=False
-
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                paused=True
+                pause()
     display.blit(background, (0, 0))
     drawplayers()
+    drawbackground()
     player1movement()
     player2movement()
     drawpath()
     playerdead() 
     playernames()
+
 
     if playerdeath:
         playerreset()
@@ -184,9 +216,9 @@ while running:
 
 
     pygame.display.update()
-    clock.tick(10)
+    clock.tick(20)
 
 pygame.quit()
 sys.exit()
 
-#Quelllen: Pygame documentation, Stackoverflow, Geeks for geeks
+#Quelllen: Pygame documentation, Stackoverflow, Geeks for geeks, thepythoncode.com,
