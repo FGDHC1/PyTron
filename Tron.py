@@ -29,6 +29,8 @@ player2name="player2"
 player1score=0
 player2score=0
 
+#load Button images
+start
 
 def retrogrid (surface, gridcolor, gridsize):
     for x in range(0, width, gridsize):
@@ -172,17 +174,7 @@ def playernames():
     textRectp2.center = 50, 40
     display.blit(textp2, textRectp2)
 
-# class button():
-#     def __init__(self, color, x,y,width,height, text=''):
-#         self.color = color
-#         self.x = x
-#         self.y = y
-#         self.width = width
-#         self.height = height
-#         self.text = text
 
-# def draw(self, win):
-#     pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height), 0)
 
 def pause():
     global paused
@@ -193,12 +185,6 @@ def pause():
     textRectpause=pausetext.get_rect()
     textRectpause.center=width/2,height/4
     display.blit(pausetext,textRectpause)
-
-    # quit_button = button(green, width/8*7, height/4*3, 10, 20, "Quit")
-    # continue_button = button(red, width/8, height/4*3,10, 20, "Continue")
-    # quit_button.draw(display)
-    # continue_button.draw(display)
-
 
     while paused:
         for event in pygame.event.get():
@@ -246,3 +232,4 @@ pygame.quit()
 sys.exit()
 
 #Quelllen: Pygame documentation, Stackoverflow, Geeks for geeks, thepythoncode.com,
+#https://www.youtube.com/watch?v=G8MYGDf_9ho&t=162s
