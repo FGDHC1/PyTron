@@ -15,6 +15,7 @@ purple=(127,0,127)
 green=(0,255,0)
 red=(255,0,0)
 
+
 width, height=800,500
 
 display = pygame.display.set_mode((width,height))
@@ -159,27 +160,47 @@ def playernames():
     global player1name, player2name,player1score,player2score
     player1out = player1name+": "+str(player1score)
     player2out = player2name+": "+str(player2score)
-    #player2
     font=pygame.font.SysFont('Aptos',30)
+    #player2
     textp1=font.render(player1out,True,orange)
     textRectp1=textp1.get_rect()
     textRectp1.center=50,15
     display.blit(textp1,textRectp1)
     #player2
-    font = pygame.font.SysFont('Aptos', 30)
     textp2 = font.render(player2out, True, blue)
     textRectp2 = textp2.get_rect()
     textRectp2.center = 50, 40
     display.blit(textp2, textRectp2)
 
+# class button():
+#     def __init__(self, color, x,y,width,height, text=''):
+#         self.color = color
+#         self.x = x
+#         self.y = y
+#         self.width = width
+#         self.height = height
+#         self.text = text
+
+# def draw(self, win):
+#     pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height), 0)
+
 def pause():
-    global background, paused
+    global paused
+    display.fill(black)
 
-    background.fill(white)
-    pygame.display.update()
+    font = pygame.font.SysFont('Aptos', 80)
+    pausetext=font.render("Paused",True,white)
+    textRectpause=pausetext.get_rect()
+    textRectpause.center=width/2,height/4
+    display.blit(pausetext,textRectpause)
+
+    # quit_button = button(green, width/8*7, height/4*3, 10, 20, "Quit")
+    # continue_button = button(red, width/8, height/4*3,10, 20, "Continue")
+    # quit_button.draw(display)
+    # continue_button.draw(display)
+
+
     while paused:
-
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -187,8 +208,10 @@ def pause():
                 if event.key == pygame.K_ESCAPE:
                     paused = False
 
-    # background.fill(black)
-    # retrogrid(background, purple, 40)
+
+
+
+        pygame.display.update()
 
 playerreset()
 running = True
@@ -200,6 +223,7 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 paused=True
                 pause()
+
     display.blit(background, (0, 0))
     drawplayers()
     drawbackground()
