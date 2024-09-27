@@ -1,6 +1,6 @@
 import pygame
 import sys
-import copy
+import button
 
 
 
@@ -14,6 +14,7 @@ grey=(127,127,127)
 purple=(127,0,127)
 green=(0,255,0)
 red=(255,0,0)
+yellow=(255,255,0)
 
 
 width, height=800,500
@@ -29,9 +30,25 @@ player2name="player2"
 player1score=0
 player2score=0
 
+playerwidth=10
+playerspeed=10
+playerdeath=False
+paused=False
 #load Button images
-start
+start_img=pygame.image.load("Start_button.png").convert_alpha()
+continue_img=pygame.image.load("Continue_button.png").convert_alpha()
+quit_img=pygame.image.load("Quit_button.png").convert_alpha()
 
+
+
+start_button = button.Button(width/10*6,height/4*3,start_img)
+continue_button = button.Button(width/10*6,height/4*3,continue_img)
+quit_button = button.Button(width/10,height/4*3,quit_img)
+
+running = True
+start=True
+
+#Game background
 def retrogrid (surface, gridcolor, gridsize):
     for x in range(0, width, gridsize):
         pygame.draw.line(surface, gridcolor, (x,0), (x,height))
@@ -47,12 +64,6 @@ def drawbackground():
     global background
     background.fill(black)
     retrogrid(background, purple, 40)
-
-playerwidth=10
-playerspeed=10
-playerdeath=False
-paused=False
-
 
 def playerreset():
     global player1dir,player2dir, player1poshistory, player2poshistory, player1pos, player2pos, playerdeath
@@ -174,6 +185,28 @@ def playernames():
     textRectp2.center = 50, 40
     display.blit(textp2, textRectp2)
 
+def startscreen():
+    global start
+    display.fill(black)
+
+    font = pygame.font.SysFont('Aptos', 80)
+    starttext = font.render("PyTron", True, yellow)
+    textRectstart = starttext.get_rect()
+    textRectstart.center = width / 2, height / 4
+    display.blit(starttext, textRectstart)
+
+    while start:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        if start_button.draw(display):
+            start=False
+        if quit_button.draw(display):
+            pygame.quit()
+            sys.exit()
+        pygame.display.update()
+
 
 
 def pause():
@@ -181,7 +214,7 @@ def pause():
     display.fill(black)
 
     font = pygame.font.SysFont('Aptos', 80)
-    pausetext=font.render("Paused",True,white)
+    pausetext=font.render("Paused",True,yellow)
     textRectpause=pausetext.get_rect()
     textRectpause.center=width/2,height/4
     display.blit(pausetext,textRectpause)
@@ -194,13 +227,17 @@ def pause():
                 if event.key == pygame.K_ESCAPE:
                     paused = False
 
+        if continue_button.draw(display):
+            paused=False
+        if quit_button.draw(display):
+            pygame.quit()
+            sys.exit()
 
 
 
         pygame.display.update()
-
+startscreen()
 playerreset()
-running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -233,3 +270,4 @@ sys.exit()
 
 #Quelllen: Pygame documentation, Stackoverflow, Geeks for geeks, thepythoncode.com,
 #https://www.youtube.com/watch?v=G8MYGDf_9ho&t=162s
+#https://youtu.be/kDSdjsdoGOY?feature=shared&t=219
