@@ -38,12 +38,12 @@ paused=False
 start_img=pygame.image.load("Start_button.png").convert_alpha()
 continue_img=pygame.image.load("Continue_button.png").convert_alpha()
 quit_img=pygame.image.load("Quit_button.png").convert_alpha()
+title_frame=pygame.image.load("Title_frame.png").convert_alpha()
 
-
-
-start_button = button.Button(width/10*6,height/4*3,start_img)
-continue_button = button.Button(width/10*6,height/4*3,continue_img)
-quit_button = button.Button(width/10,height/4*3,quit_img)
+start_button = button.Button(width/10*6,height/4*3,start_img,1)
+continue_button = button.Button(width/10*6,height/4*3,continue_img,1)
+quit_button = button.Button(width/10,height/4*3,quit_img, 1)
+title_frame = button.Button(120,70,title_frame,1)
 
 running = True
 start=True
@@ -205,6 +205,7 @@ def startscreen():
         if quit_button.draw(display):
             pygame.quit()
             sys.exit()
+        title_frame.draw(display)
         pygame.display.update()
 
 
@@ -236,6 +237,7 @@ def pause():
 
 
         pygame.display.update()
+
 startscreen()
 playerreset()
 while running:
