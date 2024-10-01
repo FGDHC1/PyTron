@@ -245,10 +245,10 @@ def startscreen():
     global start,player1name,player2name
     display.fill(black)
 
-    font = pygame.font.SysFont('aptosextrabold', 60)
+    font = pygame.font.SysFont('segoeuisemibold', 65)
     starttext = font.render("PyTron", True, yellow)
     textRectstart = starttext.get_rect()
-    textRectstart.center = width / 2, height / 4-7
+    textRectstart.center = width / 2, height / 4-15
     display.blit(starttext, textRectstart)
 
     while start:
@@ -266,7 +266,7 @@ def startscreen():
             manager.process_events(event)
         manager.update(UIRefreshRate)
 
-        highscore_font = pygame.font.SysFont('aptos', 20)
+        highscore_font = pygame.font.SysFont('segoeuisemibold', 20)
         highscoretext = highscore_font.render(f"Highscore: {highscore} from {highscorename}", True, white)
         textRecthighscore = highscoretext.get_rect()
         textRecthighscore.center = width/2,height/4+70
@@ -288,7 +288,7 @@ def pause():
     global paused
     display.fill(black)
 
-    font = pygame.font.SysFont('Aptossemibold', 80)
+    font = pygame.font.SysFont('segoeuisemibold', 65)
     pausetext=font.render("Paused",True,yellow)
     textRectpause=pausetext.get_rect()
     textRectpause.center=width/2,height/4
