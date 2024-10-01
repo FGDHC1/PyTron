@@ -4,8 +4,7 @@ import pygame
 import sys
 import button
 import pygame_gui
-
-
+import shelve
 
 pygame.init()
 
@@ -21,10 +20,14 @@ red=(255,0,0)
 yellow=(255,255,0)
 
 #display conditions
-width, height=800,500
+width, height=1000,700
 display = pygame.display.set_mode((width,height))
 pygame.display.set_caption('PyTron')
 pygame.mouse.set_visible(True)
+
+#highscorevariables
+highscore = 0
+highscorename = 'Nobody'
 
 #pygame_gui manager and Textfields
 manager=pygame_gui.UIManager((width,height))
@@ -33,6 +36,9 @@ Player2nameField=pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((
 
 #FPS
 clock = pygame.time.Clock()
+
+#Debug
+debug=False
 
 #Playerstatus
 player1name=Player1nameField.get_text()
@@ -44,9 +50,6 @@ playerwidth=10
 playerspeed=10
 playerdeath=False
 
-#TextField
-
-
 #load Button images
 start_img=pygame.image.load("png/Start_button.png").convert_alpha()
 continue_img=pygame.image.load("png/Continue_button.png").convert_alpha()
@@ -57,7 +60,7 @@ title_frame=pygame.image.load("png/Title_frame.png").convert_alpha()
 start_button = button.Button(width/10*6,height/4*3,start_img,1)
 continue_button = button.Button(width/10*6,height/4*3,continue_img,1)
 quit_button = button.Button(width/10,height/4*3,quit_img, 1)
-title_frame = button.Button(120,70,title_frame,1)
+title_frame = button.Button(width/2-280,height/4-60,title_frame,1)
 
 
 
@@ -201,32 +204,58 @@ def playernames():
     #Text on Scoreboard
     player1out = player1name+": "+str(player1score)
     player2out = player2name+": "+str(player2score)
-    font=pygame.font.SysFont('Aptos',30)
+    font=pygame.font.SysFont('aptossemibold',20)
     #player2
     textp1=font.render(player1out,True,orange)
-    textRectp1=textp1.get_rect()
-    textRectp1.center=50,15
+    textRectp1=10,10
     display.blit(textp1,textRectp1)
     #player2
     textp2 = font.render(player2out, True, blue)
-    textRectp2 = textp2.get_rect()
-    textRectp2.center = 50, 40
+    textRectp2 = 10, 35
     display.blit(textp2, textRectp2)
+
+def save_highscore():
+    #determine if highscore is topped
+    global player1score, player2score,player1name,player2name,highscore,highscorename
+    if debug:
+        pass
+    else:
+        if player1score>player2score and player1score>highscore:
+            highscore=player1score
+            highscorename=player1name
+        if player2score>player1score and player2score>highscore:
+            highscore=player2score
+            highscorename=player2name
+        #save highscore
+        with open('highscore.txt', 'w') as file:
+            file.write(f"{highscore},{highscorename}")
+
+
+def load_highscore():
+    global highscore, highscorename
+    try:
+        with open('highscore.txt', 'r') as file:
+            line = file.readline()
+            highscore_str, highscorename = line.strip().split(',')
+            highscore = int(highscore_str)
+    except Exception:
+        highscore, highscorename = 0, 'Nobody'
 
 def startscreen():
     global start,player1name,player2name
     display.fill(black)
 
-    font = pygame.font.SysFont('Aptos', 80)
+    font = pygame.font.SysFont('aptosextrabold', 60)
     starttext = font.render("PyTron", True, yellow)
     textRectstart = starttext.get_rect()
-    textRectstart.center = width / 2, height / 4
+    textRectstart.center = width / 2, height / 4-7
     display.blit(starttext, textRectstart)
 
     while start:
         UIRefreshRate=clock.tick(20)/1200
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                save_highscore()
                 pygame.quit()
                 sys.exit()
             if event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED and event.ui_element == Player1nameField:
@@ -237,9 +266,16 @@ def startscreen():
             manager.process_events(event)
         manager.update(UIRefreshRate)
 
+        highscore_font = pygame.font.SysFont('aptos', 20)
+        highscoretext = highscore_font.render(f"Highscore: {highscore} from {highscorename}", True, white)
+        textRecthighscore = highscoretext.get_rect()
+        textRecthighscore.center = width/2,height/4+70
+        display.blit(highscoretext, textRecthighscore)
+
         if start_button.draw(display):
             start=False
         if quit_button.draw(display):
+            save_highscore()
             pygame.quit()
             sys.exit()
         title_frame.draw(display)
@@ -252,7 +288,7 @@ def pause():
     global paused
     display.fill(black)
 
-    font = pygame.font.SysFont('Aptos', 80)
+    font = pygame.font.SysFont('Aptossemibold', 80)
     pausetext=font.render("Paused",True,yellow)
     textRectpause=pausetext.get_rect()
     textRectpause.center=width/2,height/4
@@ -261,6 +297,7 @@ def pause():
     while paused:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                save_highscore()
                 pygame.quit()
 
             if event.type == pygame.KEYDOWN:
@@ -270,6 +307,7 @@ def pause():
         if continue_button.draw(display):
             paused=False
         if quit_button.draw(display):
+            save_highscore()
             pygame.quit()
             sys.exit()
 
@@ -277,6 +315,8 @@ def pause():
 
         pygame.display.update()
 
+
+load_highscore()
 startscreen()
 playerreset()
 while running:
@@ -287,7 +327,14 @@ while running:
             if event.key == pygame.K_ESCAPE or event.key == pygame.K_p:
                 paused=True
                 pause()
-
+            #debug
+            if event.key == pygame.K_6:
+                player1score=player1score+2
+                debug=True
+            if event.key == pygame.K_7:
+                player2score=player2score+10
+                debug=True
+            #debug end
     display.blit(background, (0, 0))
     drawplayers()
     drawbackground()
@@ -306,6 +353,8 @@ while running:
     pygame.display.update()
     clock.tick(20)
 
+
+save_highscore()
 pygame.quit()
 sys.exit()
 
