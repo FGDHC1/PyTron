@@ -204,7 +204,7 @@ def playernames():
     #Text on Scoreboard
     player1out = player1name+": "+str(player1score)
     player2out = player2name+": "+str(player2score)
-    font=pygame.font.SysFont('aptossemibold',20)
+    font=pygame.font.SysFont('segoeuisemibold',20)
     #player2
     textp1=font.render(player1out,True,orange)
     textRectp1=10,10
