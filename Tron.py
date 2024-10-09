@@ -35,13 +35,12 @@ highscore = 0
 highscorename = 'Nobody'
 
 #debug
-def toggle_debug_mode(event):
+def activate_debug_mode(event):
     global debug
     pressed_keys = pygame.key.get_pressed()
     if pressed_keys[pygame.K_d] and pressed_keys[pygame.K_e] and pressed_keys[pygame.K_v]:
         debug =True
         print("Debug Mode: ON")
-
 
 def debugtools(event):
     def layoutlines():
@@ -338,7 +337,7 @@ def load_highscore():
 
 
 def roundlimter():
-    global roundcounting,no_of_rounds,round_limit,paused2
+    global roundcounting,no_of_rounds,round_limit,paused
     if roundcounting:
         if no_of_rounds < round_limit:
             pass
@@ -347,8 +346,11 @@ def roundlimter():
 
 
 def numberfilter(input_string):
-    filtered =''.join(filter(str.isdigit, input_string))
-    return int(filtered)
+        filtered =''.join(filter(str.isdigit, input_string))
+        if filtered=="":
+            pass
+        else:
+            return int(filtered)
 
 
 def pausestats():
@@ -448,7 +450,7 @@ def startscreen():
 
             #debug
             if event.type == pygame.KEYDOWN:
-                toggle_debug_mode(event)
+                activate_debug_mode(event)
             if debug:
                 debugtools(event)
             #debug end
@@ -499,7 +501,7 @@ def pause():
 
             #debug
             if event.type == pygame.KEYDOWN:
-                toggle_debug_mode(event)
+                activate_debug_mode(event)
             if debug:
                 debugtools(event)
             #debug end
@@ -525,11 +527,10 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE or event.key == pygame.K_p:
                 paused=True
-                pause()
             #debug
-            toggle_debug_mode(event)
-        if debug:
-            debugtools(event)
+            activate_debug_mode(event)
+    if debug:
+        debugtools(event)
             #debug end
     display.blit(background, (0, 0))
     drawplayers()
@@ -541,6 +542,8 @@ while running:
     playernames()
     roundlimter()
 
+    if paused==True:
+        pause()
 
     if playerdeath:
         playerreset()
