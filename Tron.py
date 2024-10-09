@@ -255,36 +255,43 @@ def drawpath():
 
 
 def playerdead():
-    global playerdeath,player1score,player2score,no_of_rounds
+    global playerdeath,player1score,player2score,no_of_rounds,player1cutoffdeath,player1selfdeath,player2cutoffdeath,player2selfdeath,player1borderdeath,player2borderdeath
     #player1 collision
     if player1pos in player2poshistory:
         playerdeath = True
         player2score += 1
         no_of_rounds += 1
+        player1cutoffdeath += 1
     if player1pos in player1poshistory[:-1]:
         playerdeath = True
         player2score += 1
         no_of_rounds += 1
+        player1selfdeath += 1
 
     # player2 collision
-    if player2pos in player2poshistory[:-1]:
-        playerdeath = True
-        player1score += 1
-        no_of_rounds += 1
     if player2pos in player1poshistory:
         playerdeath = True
         player1score += 1
         no_of_rounds += 1
+        player2cutoffdeath += 1
+    if player2pos in player2poshistory[:-1]:
+        playerdeath = True
+        player1score += 1
+        no_of_rounds += 1
+        player2selfdeath += 1
+
 
     #border collision
     if player1pos[0] < 0 or player1pos[0] > width-1 or player1pos[1] < 0 or player1pos[1] > height-1 :
         playerdeath = True
         player2score += 1
         no_of_rounds += 1
+        player1borderdeath += 1
     if player2pos[0] < 0 or player2pos[0] > width-1 or player2pos[1] < 0 or player2pos[1] > height-1 :
         playerdeath = True
         player1score += 1
         no_of_rounds += 1
+        player2borderdeath += 1
 
 
 def playernames():
@@ -343,6 +350,72 @@ def numberfilter(input_string):
     filtered =''.join(filter(str.isdigit, input_string))
     return int(filtered)
 
+
+def pausestats():
+    stat_font = pygame.font.SysFont('segoeuisemibold', 20)
+    playername_font = pygame.font.SysFont('segoeuisemibold', 30)
+
+    player1name_text = playername_font.render(player1name, True, orange)
+    player2name_text = playername_font.render(player2name, True, blue)
+    #get player1stats
+    player1score_text = stat_font.render("Score: "+str(player1score), True, white)
+    player1selfdeath_text = stat_font.render("Death by self-collision: "+str(player1selfdeath), True, white)
+    player1cutoffdeath_text = stat_font.render("Death by opponent-collision: "+str(player1cutoffdeath), True, white)
+    player1borderdeath_text = stat_font.render("Death by border-collision: "+str(player1borderdeath), True, white)
+    #get player2stats
+    player2score_text = stat_font.render("Score: "+str(player2score), True, white)
+    player2selfdeath_text = stat_font.render("Death by self-collision: "+str(player2selfdeath), True, white)
+    player2cutoffdeath_text = stat_font.render("Death by opponent-collision: "+str(player2cutoffdeath), True, white)
+    player2borderdeath_text = stat_font.render("Death by border-collision: "+str(player2cutoffdeath), True, white)
+
+    #center texts from player1
+    textRectplayer1name=player1name_text.get_rect()
+    textRectplayer1name.center=width/4,height/4
+
+    textRectplayer1score=player1score_text.get_rect()
+    textRectplayer1score.center=width/4,height/4+40
+
+    textRectplayer1selfdeath=player1selfdeath_text.get_rect()
+    textRectplayer1selfdeath.center=width/4,height/4+70
+
+    textRectplayer1cutoffdeath=player1cutoffdeath_text.get_rect()
+    textRectplayer1cutoffdeath.center=width/4,height/4+100
+
+    textRectplayer1borderdeath=player1borderdeath_text.get_rect()
+    textRectplayer1borderdeath.center=width/4,height/4+130
+
+    #center texts from player2
+    textRectplayer2name=player2name_text.get_rect()
+    textRectplayer2name.center=width/4*3,height/4
+
+    textRectplayer2score=player2score_text.get_rect()
+    textRectplayer2score.center=width/4*3,height/4+40
+
+    textRectplayer2selfdeath=player2selfdeath_text.get_rect()
+    textRectplayer2selfdeath.center=width/4*3,height/4+70
+
+    textRectplayer2cutoffdeath=player2cutoffdeath_text.get_rect()
+    textRectplayer2cutoffdeath.center=width/4*3,height/4+100
+
+    textRectplayer2borderdeath=player2borderdeath_text.get_rect()
+    textRectplayer2borderdeath.center=width/4*3,height/4+130
+
+
+
+    #show names
+    display.blit(player1name_text, textRectplayer1name)
+    display.blit(player2name_text, textRectplayer2name)
+
+    #show player1 stats
+    display.blit(player1score_text, textRectplayer1score)
+    display.blit(player1selfdeath_text, textRectplayer1selfdeath)
+    display.blit(player1cutoffdeath_text, textRectplayer1cutoffdeath)
+    display.blit(player1borderdeath_text, textRectplayer1borderdeath)
+    #show player2 stats
+    display.blit(player2score_text, textRectplayer2score)
+    display.blit(player2selfdeath_text, textRectplayer2selfdeath)
+    display.blit(player2cutoffdeath_text, textRectplayer2cutoffdeath)
+    display.blit(player2borderdeath_text, textRectplayer2borderdeath)
 
 
 def startscreen():
@@ -437,7 +510,7 @@ def pause():
             save_highscore()
             pygame.quit()
             sys.exit()
-
+        pausestats()
         pygame.display.update()
     pygame.mouse.set_visible(False)
 
