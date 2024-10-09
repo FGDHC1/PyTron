@@ -1,10 +1,7 @@
-from turtledemo.sorting_animate import show_text
-
 import pygame
 import sys
 import button
 import pygame_gui
-import shelve
 
 pygame.init()
 
@@ -19,6 +16,14 @@ green=(0,255,0)
 red=(255,0,0)
 yellow=(255,255,0)
 
+#deathvariants
+player1selfdeath=0
+player2selfdeath=0
+player1cutoffdeath=0
+player2cutoffdeath=0
+player1borderdeath=0
+player2borderdeath=0
+
 #display conditions
 width, height=1000,700
 display = pygame.display.set_mode((width,height))
@@ -29,10 +34,70 @@ pygame.mouse.set_visible(True)
 highscore = 0
 highscorename = 'Nobody'
 
-#pygame_gui manager and Textfields
-manager=pygame_gui.UIManager((width,height))
-Player1nameField=pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((width/10,275),(250,40)), manager=manager, object_id="#player1name",initial_text="Player1")
-Player2nameField=pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((width/10*6,275),(250,40)), manager=manager, object_id="#player2name",initial_text="Player2")
+#debug
+def toggle_debug_mode(event):
+    global debug
+    pressed_keys = pygame.key.get_pressed()
+    if pressed_keys[pygame.K_d] and pressed_keys[pygame.K_e] and pressed_keys[pygame.K_v]:
+        debug =True
+        print("Debug Mode: ON")
+
+
+def debugtools(event):
+    def layoutlines():
+        pygame.draw.line(display, white, (width/2, 0), (width/2, height))
+        pygame.draw.line(display, white, (width/3, 0), (width/3, height))
+        pygame.draw.line(display, white, (width/3*2, 0), (2*width/3, height))
+        pygame.draw.line(display, white, (width/4, 0), (width/4, height))
+        pygame.draw.line(display, white, (width/4*3, 0), (3*width/4, height))
+
+        # Horizontale Linie
+        pygame.draw.line(display, white, (0, height/2), (width, height/2))
+        pygame.draw.line(display, white, (0, height/4), (width, height/4))
+        pygame.draw.line(display, white, (0, height/4*3), (width, height/4*3))
+
+    def pointdebug(event):
+        global player1score, player2score,debug
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_6:
+                player1score = player1score + 1000000000000000000000000000000000000000000000000000000000000000000000000
+                debug = True
+            if event.key == pygame.K_7:
+                player2score = player2score + 1000000000000000000000000000000000000000000000000000000000000000000000000
+                debug = True
+    def showvariables():
+        font = pygame.font.SysFont('Arial', 15)
+        #extract
+        debug_text = font.render(f"Debug: {debug}", True, white)
+        clock_text = font.render(f"Clock: {clock}", True, white)
+        playerdeath_text = font.render(f"Death: {playerdeath}", True, white)
+        no_of_rounds_text = font.render(f"No.Rounds: {no_of_rounds}", True, white)
+        round_limit_text = font.render(f"RoundLimit: {round_limit}", True, white)
+        roundcounting_text = font.render(f"RoundCounting: {roundcounting}", True, white)
+        running_text = font.render(f"Running: {running}", True, white)
+        paused_text = font.render(f"Paused: {paused}", True, white)
+        start_text = font.render(f"Start: {start}", True, white)
+        highscore_text = font.render(f"Highscore: {highscore}", True, white)
+        highscorename_text = font.render(f"Highscorename: {highscorename}", True, white)
+
+        #show
+        display.blit(debug_text, (width-150, 0))
+        display.blit(clock_text, (width-150, 20))
+        display.blit(playerdeath_text, (width-150, 40))
+        display.blit(no_of_rounds_text, (width-150, 60))
+        display.blit(round_limit_text, (width-150, 80))
+        display.blit(roundcounting_text, (width-150, 100))
+        display.blit(running_text, (width-150, 120))
+        display.blit(paused_text, (width-150, 140))
+        display.blit(start_text, (width-150, 160))
+        display.blit(highscore_text, (width-150, 180))
+        display.blit(highscorename_text, (width-150, 200))
+
+    layoutlines()
+    pointdebug(event)
+    showvariables()
+
+#debug end
 
 #FPS
 clock = pygame.time.Clock()
@@ -41,14 +106,33 @@ clock = pygame.time.Clock()
 debug=False
 
 #Playerstatus
-player1name=Player1nameField.get_text()
-player2name=Player2nameField.get_text()
+player1name="Player1"
+player2name="Player2"
 player1score=0
 player2score=0
 
 playerwidth=10
 playerspeed=10
 playerdeath=False
+
+#round limiter
+no_of_rounds=0
+round_limit=0
+roundcounting=False
+
+#gamestatus
+paused=False
+running = True
+start=True
+
+#pygame_gui manager and Textfields
+manager=pygame_gui.UIManager((width,height))
+Player1nameField=pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((width/4-125,height/2),(250,40)),
+                                                    manager=manager, object_id="#player1name",initial_text="Player1")
+Player2nameField=pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((((width/4)*3)-125,height/2),(250,40)),
+                                                    manager=manager, object_id="#player2name",initial_text="Player2")
+roundLimitField=pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((width/2-45,height/4*3),(95,40)),
+                                                    manager=manager,object_id="#roundLimit",placeholder_text="Max Rounds")
 
 #load Button images
 start_img=pygame.image.load("png/Start_button.png").convert_alpha()
@@ -57,17 +141,10 @@ quit_img=pygame.image.load("png/Quit_button.png").convert_alpha()
 title_frame=pygame.image.load("png/Title_frame.png").convert_alpha()
 
 #configure objects
-start_button = button.Button(width/10*6,height/4*3,start_img,1)
-continue_button = button.Button(width/10*6,height/4*3,continue_img,1)
-quit_button = button.Button(width/10,height/4*3,quit_img, 1)
-title_frame = button.Button(width/2-280,height/4-60,title_frame,1)
-
-
-
-#gamestatus
-paused=False
-running = True
-start=True
+start_button = button.Button(((width/4)*3)-125,height/4*3,start_img,1)
+continue_button = button.Button(((width/4)*3)-125,height/4*3,continue_img,1)
+quit_button = button.Button(width/4-125,height/4*3,quit_img, 1)
+title_frame = button.Button(width/2-280,height/4-55,title_frame,1)
 
 #Game background
 def retrogrid (surface, gridcolor, gridsize):
@@ -86,6 +163,7 @@ def drawbackground():
     background.fill(black)
     retrogrid(background, purple, 40)
 
+
 def playerreset():
     global player1dir,player2dir, player1poshistory, player2poshistory, player1pos, player2pos, playerdeath
     #P1
@@ -99,11 +177,13 @@ def playerreset():
 
     playerdeath=False
 
+
 def drawplayers():
     #P1
     pygame.draw.rect(display, orange, pygame.Rect(player1pos[0],player1pos[1], playerwidth, playerwidth))
     #P2
     pygame.draw.rect(display, blue, pygame.Rect(player2pos[0], player2pos[1], playerwidth, playerwidth))
+
 
 def player1movement():
     global player1poshistory, player1dir, player1pos
@@ -164,6 +244,7 @@ def player2movement():
     else:
         player2poshistory.append(player2pos.copy())
 
+
 def drawpath():
         #P1
         for pos1 in player1poshistory:
@@ -172,32 +253,39 @@ def drawpath():
         for pos2 in player2poshistory:
             pygame.draw.rect(display, blue, pygame.Rect(pos2[0], pos2[1], playerwidth, playerwidth))
 
+
 def playerdead():
-    global playerdeath,player1score,player2score
+    global playerdeath,player1score,player2score,no_of_rounds
     #player1 collision
     if player1pos in player2poshistory:
         playerdeath = True
         player2score += 1
+        no_of_rounds += 1
     if player1pos in player1poshistory[:-1]:
         playerdeath = True
         player2score += 1
+        no_of_rounds += 1
 
     # player2 collision
     if player2pos in player2poshistory[:-1]:
         playerdeath = True
         player1score += 1
+        no_of_rounds += 1
     if player2pos in player1poshistory:
         playerdeath = True
         player1score += 1
-
+        no_of_rounds += 1
 
     #border collision
     if player1pos[0] < 0 or player1pos[0] > width-1 or player1pos[1] < 0 or player1pos[1] > height-1 :
         playerdeath = True
         player2score += 1
+        no_of_rounds += 1
     if player2pos[0] < 0 or player2pos[0] > width-1 or player2pos[1] < 0 or player2pos[1] > height-1 :
         playerdeath = True
         player1score += 1
+        no_of_rounds += 1
+
 
 def playernames():
     global player1name, player2name,player1score,player2score
@@ -213,6 +301,7 @@ def playernames():
     textp2 = font.render(player2out, True, blue)
     textRectp2 = 10, 35
     display.blit(textp2, textRectp2)
+
 
 def save_highscore():
     #determine if highscore is topped
@@ -230,7 +319,6 @@ def save_highscore():
         with open('highscore.txt', 'w') as file:
             file.write(f"{highscore},{highscorename}")
 
-
 def load_highscore():
     global highscore, highscorename
     try:
@@ -241,14 +329,31 @@ def load_highscore():
     except Exception:
         highscore, highscorename = 0, 'Nobody'
 
-def startscreen():
-    global start,player1name,player2name
-    display.fill(black)
 
-    font = pygame.font.SysFont('segoeuisemibold', 65)
-    starttext = font.render("PyTron", True, yellow)
+def roundlimter():
+    global roundcounting,no_of_rounds,round_limit,paused2
+    if roundcounting:
+        if no_of_rounds < round_limit:
+            pass
+        else:
+            paused=True
+
+
+def numberfilter(input_string):
+    filtered =''.join(filter(str.isdigit, input_string))
+    return int(filtered)
+
+
+
+def startscreen():
+    global start,player1name,player2name,round_limit,roundcounting,debug
+    display.fill(black)
+    pygame.mouse.set_visible(True)
+
+    title_font = pygame.font.SysFont('segoeuisemibold', 65)
+    starttext = title_font.render("PyTron", True, yellow)
     textRectstart = starttext.get_rect()
-    textRectstart.center = width / 2, height / 4-15
+    textRectstart.center = width / 2, height / 4-10
     display.blit(starttext, textRectstart)
 
     while start:
@@ -258,10 +363,23 @@ def startscreen():
                 save_highscore()
                 pygame.quit()
                 sys.exit()
+            #getnames
             if event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED and event.ui_element == Player1nameField:
                 player1name = event.text
             if event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED and event.ui_element == Player2nameField:
                 player2name = event.text
+            #roundlimiting
+            if event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED and event.ui_element == roundLimitField:
+                round_limit = numberfilter(event.text)
+                roundcounting=True
+
+            #debug
+            if event.type == pygame.KEYDOWN:
+                toggle_debug_mode(event)
+            if debug:
+                debugtools(event)
+            #debug end
+
 
             manager.process_events(event)
         manager.update(UIRefreshRate)
@@ -281,17 +399,19 @@ def startscreen():
         title_frame.draw(display)
         manager.draw_ui(display)
         pygame.display.update()
-
+    round_limit = int(round_limit)
+    pygame.mouse.set_visible(False)
 
 
 def pause():
-    global paused
+    global paused,debug
+    pygame.mouse.set_visible(True)
     display.fill(black)
 
-    font = pygame.font.SysFont('segoeuisemibold', 65)
-    pausetext=font.render("Paused",True,yellow)
+    title_font = pygame.font.SysFont('segoeuisemibold', 65)
+    pausetext=title_font.render("Paused",True,yellow)
     textRectpause=pausetext.get_rect()
-    textRectpause.center=width/2,height/4
+    textRectpause.center=width/2,height/4-10
     display.blit(pausetext,textRectpause)
 
     while paused:
@@ -304,6 +424,13 @@ def pause():
                 if event.key == pygame.K_ESCAPE or event.key == pygame.K_0:
                     paused = False
 
+            #debug
+            if event.type == pygame.KEYDOWN:
+                toggle_debug_mode(event)
+            if debug:
+                debugtools(event)
+            #debug end
+
         if continue_button.draw(display):
             paused=False
         if quit_button.draw(display):
@@ -311,9 +438,8 @@ def pause():
             pygame.quit()
             sys.exit()
 
-
-
         pygame.display.update()
+    pygame.mouse.set_visible(False)
 
 
 load_highscore()
@@ -328,12 +454,9 @@ while running:
                 paused=True
                 pause()
             #debug
-            if event.key == pygame.K_6:
-                player1score=player1score+2
-                debug=True
-            if event.key == pygame.K_7:
-                player2score=player2score+10
-                debug=True
+            toggle_debug_mode(event)
+        if debug:
+            debugtools(event)
             #debug end
     display.blit(background, (0, 0))
     drawplayers()
@@ -343,6 +466,7 @@ while running:
     drawpath()
     playerdead() 
     playernames()
+    roundlimter()
 
 
     if playerdeath:
