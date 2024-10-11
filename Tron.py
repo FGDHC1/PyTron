@@ -24,6 +24,14 @@ player2cutoffdeath=0
 player1borderdeath=0
 player2borderdeath=0
 
+#who died
+player1died=False
+player2died=False
+
+#displaytime
+start_time=pygame.time.get_ticks()
+
+
 #display conditions
 width, height=1000,700
 display = pygame.display.set_mode((width,height))
@@ -78,6 +86,8 @@ def debugtools(event):
         start_text = font.render(f"Start: {start}", True, white)
         highscore_text = font.render(f"Highscore: {highscore}", True, white)
         highscorename_text = font.render(f"Highscorename: {highscorename}", True, white)
+        player1died_text = font.render(f"Player1died: {player1died}", True, white)
+        player2died_text = font.render(f"Player2died: {player2died}", True, white)
 
         #show
         display.blit(debug_text, (width-150, 0))
@@ -91,6 +101,9 @@ def debugtools(event):
         display.blit(start_text, (width-150, 160))
         display.blit(highscore_text, (width-150, 180))
         display.blit(highscorename_text, (width-150, 200))
+        display.blit(player1died_text, (width-150, 220))
+        display.blit(player2died_text, (width - 150, 240))
+
 
     layoutlines()
     pointdebug(event)
@@ -121,7 +134,7 @@ roundcounting=False
 
 #gamestatus
 paused=False
-running = True
+running=True
 start=True
 
 #pygame_gui manager and Textfields
@@ -164,7 +177,7 @@ def drawbackground():
 
 
 def playerreset():
-    global player1dir,player2dir, player1poshistory, player2poshistory, player1pos, player2pos, playerdeath
+    global player1dir,player2dir, player1poshistory, player2poshistory, player1pos, player2pos, playerdeath, start_time
     #P1
     player1pos = [width // 4, height // 2]
     player1dir = pygame.K_RIGHT
@@ -173,6 +186,8 @@ def playerreset():
     player2pos = [width // 4 * 3, height // 2]
     player2dir = pygame.K_a
     player2poshistory = [player2pos.copy()]
+
+    start_time=pygame.time.get_ticks()
 
     playerdeath=False
 
@@ -254,15 +269,19 @@ def drawpath():
 
 
 def playerdead():
-    global playerdeath,player1score,player2score,no_of_rounds,player1cutoffdeath,player1selfdeath,player2cutoffdeath,player2selfdeath,player1borderdeath,player2borderdeath
+    global no_of_rounds, player1score, player2score
+    global player1cutoffdeath, player1selfdeath, player1borderdeath, player2cutoffdeath, player2selfdeath, player2borderdeath
+    global player1died, player2died, playerdeath
     #player1 collision
     if player1pos in player2poshistory:
         playerdeath = True
+        player1died=True
         player2score += 1
         no_of_rounds += 1
         player1cutoffdeath += 1
     if player1pos in player1poshistory[:-1]:
         playerdeath = True
+        player1died=True
         player2score += 1
         no_of_rounds += 1
         player1selfdeath += 1
@@ -270,11 +289,13 @@ def playerdead():
     # player2 collision
     if player2pos in player1poshistory:
         playerdeath = True
+        player2died=True
         player1score += 1
         no_of_rounds += 1
         player2cutoffdeath += 1
     if player2pos in player2poshistory[:-1]:
         playerdeath = True
+        player2died=True
         player1score += 1
         no_of_rounds += 1
         player2selfdeath += 1
@@ -283,11 +304,13 @@ def playerdead():
     #border collision
     if player1pos[0] < 0 or player1pos[0] > width-1 or player1pos[1] < 0 or player1pos[1] > height-1 :
         playerdeath = True
+        player1died=True
         player2score += 1
         no_of_rounds += 1
         player1borderdeath += 1
     if player2pos[0] < 0 or player2pos[0] > width-1 or player2pos[1] < 0 or player2pos[1] > height-1 :
         playerdeath = True
+        player2died=True
         player1score += 1
         no_of_rounds += 1
         player2borderdeath += 1
@@ -351,6 +374,37 @@ def numberfilter(input_string):
             pass
         else:
             return int(filtered)
+
+def show_roundwinner(start_time):
+    global player1died, player2died
+    font = pygame.font.SysFont('segoeuisemibold', 20)
+
+    player1win_text = font.render(player1name + " made a point!", True, orange)
+    textRectplayer1win = player1win_text.get_rect(center=(width / 2, height / 4))
+
+    player2win_text = font.render(player2name + " made a point!", True, blue)
+    textRectplayer2win = player2win_text.get_rect(center=(width / 2, height / 4))
+
+    playertie_text = font.render("The round is a tie!", True, white)
+    textRectplayertie = playertie_text.get_rect(center=(width / 2, height / 4))
+
+    show_time = 500
+
+    if player1died != player2died:
+        if player1died:
+            display.blit(player2win_text, textRectplayer2win)
+            pygame.display.update()
+            pygame.time.delay(show_time)
+        else:
+            display.blit(player1win_text, textRectplayer1win)
+            pygame.display.update()
+            pygame.time.delay(show_time)
+    elif player1died and player2died:
+        display.blit(playertie_text, textRectplayertie)
+        pygame.display.update()
+        pygame.time.delay(show_time)
+    player1died=False
+    player2died=False
 
 
 def pausestats():
@@ -516,6 +570,7 @@ def pause():
         pygame.display.update()
     pygame.mouse.set_visible(False)
 
+#main loop
 
 load_highscore()
 startscreen()
@@ -538,9 +593,15 @@ while running:
     player1movement()
     player2movement()
     drawpath()
-    playerdead() 
+    playerdead()
     playernames()
     roundlimter()
+#    show_roundwinner(start_time)
+
+    if playerdeath:
+        show_roundwinner(start_time)
+        pygame.display.update()
+        clock.tick(20)
 
     if paused==True:
         pause()
