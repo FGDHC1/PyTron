@@ -5,7 +5,6 @@ class Button:
         imagewidth = image.get_width()
         imageheight = image.get_height()
         self.image = pygame.transform.scale(image, (int(imagewidth*scale), int(imageheight*scale)))
-        self.image = image
         self.rect = self.image.get_rect()
         self.rect.topleft = (x,y)
         self.clicked = False
