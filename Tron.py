@@ -35,6 +35,8 @@ start_time=pygame.time.get_ticks()
 #speedup
 speedup=True
 
+
+
 #display conditions
 width, height=1000,700
 display = pygame.display.set_mode((width,height))
@@ -146,6 +148,7 @@ roundcounting=False
 paused=False
 running=True
 start=True
+howtoplay=False
 
 #pygame_gui manager and Textfields
 manager=pygame_gui.UIManager((width,height))
@@ -155,21 +158,27 @@ Player2nameField=pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((
                                                     manager=manager, object_id="#player2name",initial_text="Player2")
 roundLimitField=pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((width/2-45,height/4*3),(95,40)),
                                                     manager=manager,object_id="#roundLimit",placeholder_text="Max Rounds")
-speedup_button=pygame_gui.elements.UIButton(relative_rect=pygame.Rect((width/2-45,height/4*2),(95,40)),
+speedup_button=pygame_gui.elements.UIButton(relative_rect=pygame.Rect((width/2-45,height/4*3+60),(95,40)),
                                             manager=manager,object_id="#speedup",text="Speedup: On")
 
-#load Button images
+
+#load images
 start_img=pygame.image.load("png/Start_button.png").convert_alpha()
 continue_img=pygame.image.load("png/Continue_button.png").convert_alpha()
 quit_img=pygame.image.load("png/Quit_button.png").convert_alpha()
 title_frame=pygame.image.load("png/Title_frame.png").convert_alpha()
+howtoplay_img=pygame.image.load("png/HowToPlay_button_yellow.png").convert_alpha()
+cross_img=pygame.image.load("png/Cross_button.png").convert_alpha()
+arrowkeys_img=pygame.image.load("png/Arrowkeys.png").convert_alpha()
+wasd_img=pygame.image.load("png/WASD_centered.png").convert_alpha()
 
 #configure objects
 start_button = button.Button(((width/4)*3)-125,height/4*3,start_img,1)
 continue_button = button.Button(((width/4)*3)-125,height/4*3,continue_img,1)
 quit_button = button.Button(width/4-125,height/4*3,quit_img, 1)
 title_frame = button.Button(width/2-280,height/4-55,title_frame,1)
-
+howtoplay_button = button.Button(width/2-96,height/4*3-100,howtoplay_img,1)
+                                #(((width/4)*3)-96,height/4*3-80,howtoplay_img,1)
 #Game background
 def retrogrid (surface, gridcolor, gridsize):
     for x in range(0, width, gridsize):
@@ -437,10 +446,6 @@ def speedupfunc():
         gamespeed += 5
 
 
-
-
-
-
 def pausestats():
     stat_font = pygame.font.SysFont('segoeuisemibold', 20)
     playername_font = pygame.font.SysFont('segoeuisemibold', 30)
@@ -507,9 +512,52 @@ def pausestats():
     display.blit(player2cutoffdeath_text, textRectplayer2cutoffdeath)
     display.blit(player2borderdeath_text, textRectplayer2borderdeath)
 
+def howtoplay_screen():
+    global howtoplay,start
+    pygame.mouse.set_visible(True)
+    display.fill(gray)
+    title_font = pygame.font.SysFont('segoeuisemibold', 55)
+    playername_font = pygame.font.SysFont('segoeuisemibold', 30)
+
+    howtoplaytext = title_font.render("How to play", True, yellow)
+    player1name_text = playername_font.render(player1name, True, orange)
+    player2name_text = playername_font.render(player2name, True, blue)
+
+    textRecthowtoplay = howtoplaytext.get_rect()
+    textRecthowtoplay.center = width / 2, height / 4
+
+    textRectplayer1name=player1name_text.get_rect()
+    textRectplayer1name.center=width/4,height/4+100
+
+    textRectplayer2name=player2name_text.get_rect()
+    textRectplayer2name.center=width/4*3,height/4+100
+
+    display.blit(howtoplaytext, textRecthowtoplay)
+    display.blit(player1name_text, textRectplayer1name)
+    display.blit(player2name_text, textRectplayer2name)
+
+    display.blit(wasd_img,(width/4-185,height/4*2))
+    display.blit(arrowkeys_img,(width/4*3-185,height/4*2))
+    while howtoplay:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    howtoplay = False
+                    start=True
+            #debug
+            if event.type == pygame.KEYDOWN:
+                activate_debug_mode(event)
+            if debug:
+                debugtools(event)
+            #debug end
+        pygame.display.update()
+    pygame.mouse.set_visible(False)
 
 def startscreen():
-    global start,player1name,player2name,round_limit,roundcounting,debug
+    global start,player1name,player2name,round_limit,roundcounting,debug,howtoplay
     display.fill(gray)
     pygame.mouse.set_visible(True)
 
@@ -531,6 +579,7 @@ def startscreen():
                 player1name = event.text
             if event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED and event.ui_element == Player2nameField:
                 player2name = event.text
+
             #roundlimiting
             if event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED and event.ui_element == roundLimitField:
                 round_limit = numberfilter(event.text)
@@ -560,12 +609,15 @@ def startscreen():
             save_highscore()
             pygame.quit()
             sys.exit()
+        if howtoplay_button.draw(display):
+            start=False
+            howtoplay=True
+
         title_frame.draw(display)
         manager.draw_ui(display)
         pygame.display.update()
     round_limit = int(round_limit)
     pygame.mouse.set_visible(False)
-
 
 def pause():
     global paused,debug
@@ -585,7 +637,7 @@ def pause():
                 pygame.quit()
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE or event.key == pygame.K_0:
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_p:
                     paused = False
 
             #debug
@@ -631,14 +683,19 @@ while running:
     playerdead()
     playernames()
     roundlimter()
-#    show_roundwinner(start_time)
+
 
     if playerdeath:
         show_roundwinner(start_time)
         pygame.display.update()
 
+    if howtoplay:
+        howtoplay_screen()
 
-    if paused==True:
+    if start:
+        startscreen()
+
+    if paused:
         pause()
 
     if playerdeath:
