@@ -15,6 +15,7 @@ purple=(127,0,127)
 green=(0,255,0)
 red=(255,0,0)
 yellow=(255,255,0)
+gray=(10,10,10)
 
 #deathvariants
 player1selfdeath=0
@@ -31,6 +32,8 @@ player2died=False
 #displaytime
 start_time=pygame.time.get_ticks()
 
+#speedup
+speedup=True
 
 #display conditions
 width, height=1000,700
@@ -68,10 +71,10 @@ def debugtools(event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_6:
                 player1score = player1score + 1000000000000000000000000000000000000000000000000000000000000000000000000
-                debug = True
+
             if event.key == pygame.K_7:
                 player2score = player2score + 1000000000000000000000000000000000000000000000000000000000000000000000000
-                debug = True
+
     def showvariables():
         font = pygame.font.SysFont('Arial', 15)
         #extract
@@ -88,6 +91,8 @@ def debugtools(event):
         highscorename_text = font.render(f"Highscorename: {highscorename}", True, white)
         player1died_text = font.render(f"Player1died: {player1died}", True, white)
         player2died_text = font.render(f"Player2died: {player2died}", True, white)
+        speedup_text = font.render(f"Speedup: {speedup}", True, white)
+        gamespeed_text = font.render(f"Gamespeed: {gamespeed}", True, white)
 
         #show
         display.blit(debug_text, (width-150, 0))
@@ -99,10 +104,12 @@ def debugtools(event):
         display.blit(running_text, (width-150, 120))
         display.blit(paused_text, (width-150, 140))
         display.blit(start_text, (width-150, 160))
-        display.blit(highscore_text, (width-150, 180))
-        display.blit(highscorename_text, (width-150, 200))
-        display.blit(player1died_text, (width-150, 220))
-        display.blit(player2died_text, (width - 150, 240))
+        display.blit(highscore_text, (width-150, 340))
+        display.blit(highscorename_text, (width-150, 360))
+        display.blit(player1died_text, (width-150, 380))
+        display.blit(player2died_text, (width - 150, 400))
+        display.blit(speedup_text, (width-150, 420))
+        display.blit(gamespeed_text, (width-150, 440))
 
 
     layoutlines()
@@ -110,6 +117,9 @@ def debugtools(event):
     showvariables()
 
 #debug end
+
+#gamespeed
+gamespeed=20
 
 #FPS
 clock = pygame.time.Clock()
@@ -145,6 +155,8 @@ Player2nameField=pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((
                                                     manager=manager, object_id="#player2name",initial_text="Player2")
 roundLimitField=pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((width/2-45,height/4*3),(95,40)),
                                                     manager=manager,object_id="#roundLimit",placeholder_text="Max Rounds")
+speedup_button=pygame_gui.elements.UIButton(relative_rect=pygame.Rect((width/2-45,height/4*2),(95,40)),
+                                            manager=manager,object_id="#speedup",text="Speedup: On")
 
 #load Button images
 start_img=pygame.image.load("png/Start_button.png").convert_alpha()
@@ -314,6 +326,7 @@ def playerdead():
         player1score += 1
         no_of_rounds += 1
         player2borderdeath += 1
+    speedupfunc()
 
 
 def playernames():
@@ -377,7 +390,7 @@ def numberfilter(input_string):
 
 def show_roundwinner(start_time):
     global player1died, player2died
-    font = pygame.font.SysFont('segoeuisemibold', 20)
+    font = pygame.font.SysFont('segoeuisemibold', 50)
 
     player1win_text = font.render(player1name + " made a point!", True, orange)
     textRectplayer1win = player1win_text.get_rect(center=(width / 2, height / 4))
@@ -388,7 +401,7 @@ def show_roundwinner(start_time):
     playertie_text = font.render("The round is a tie!", True, white)
     textRectplayertie = playertie_text.get_rect(center=(width / 2, height / 4))
 
-    show_time = 500
+    show_time = 1200
 
     if player1died != player2died:
         if player1died:
@@ -405,6 +418,27 @@ def show_roundwinner(start_time):
         pygame.time.delay(show_time)
     player1died=False
     player2died=False
+
+
+def toggle_speedup(event):
+    global speedup
+    if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == speedup_button:
+        speedup = not speedup
+        if speedup:
+            speedup_button.set_text("Speedup: On")
+            print("Speedup: On")
+        else:
+            speedup_button.set_text("Speedup: Off")
+            print("Speedup: Off")
+
+def speedupfunc():
+    global gamespeed
+    if speedup and playerdeath:
+        gamespeed += 5
+
+
+
+
 
 
 def pausestats():
@@ -476,7 +510,7 @@ def pausestats():
 
 def startscreen():
     global start,player1name,player2name,round_limit,roundcounting,debug
-    display.fill(black)
+    display.fill(gray)
     pygame.mouse.set_visible(True)
 
     title_font = pygame.font.SysFont('segoeuisemibold', 65)
@@ -509,6 +543,7 @@ def startscreen():
                 debugtools(event)
             #debug end
 
+            toggle_speedup(event)
 
             manager.process_events(event)
         manager.update(UIRefreshRate)
@@ -535,7 +570,7 @@ def startscreen():
 def pause():
     global paused,debug
     pygame.mouse.set_visible(True)
-    display.fill(black)
+    display.fill(gray)
 
     title_font = pygame.font.SysFont('segoeuisemibold', 65)
     pausetext=title_font.render("Paused",True,yellow)
@@ -601,7 +636,7 @@ while running:
     if playerdeath:
         show_roundwinner(start_time)
         pygame.display.update()
-        clock.tick(20)
+
 
     if paused==True:
         pause()
@@ -612,12 +647,14 @@ while running:
 
 
     pygame.display.update()
-    clock.tick(20)
+    clock.tick(gamespeed)
 
 
 save_highscore()
 pygame.quit()
 sys.exit()
+
+#make a how to play site
 
 #Quelllen: Pygame documentation, Stackoverflow, Geeks for geeks, thepythoncode.com, Reddit
 #https://www.youtube.com/watch?v=G8MYGDf_9ho&t=162s
