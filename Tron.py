@@ -178,7 +178,7 @@ continue_button = button.Button(((width/4)*3)-125,height/4*3,continue_img,1)
 quit_button = button.Button(width/4-125,height/4*3,quit_img, 1)
 title_frame = button.Button(width/2-280,height/4-55,title_frame,1)
 howtoplay_button = button.Button(width/2-96,height/4*3-100,howtoplay_img,1)
-                                #(((width/4)*3)-96,height/4*3-80,howtoplay_img,1)
+cross_button = button.Button(width-80,30,cross_img,1)
 #Game background
 def retrogrid (surface, gridcolor, gridsize):
     for x in range(0, width, gridsize):
@@ -518,23 +518,34 @@ def howtoplay_screen():
     display.fill(gray)
     title_font = pygame.font.SysFont('segoeuisemibold', 55)
     playername_font = pygame.font.SysFont('segoeuisemibold', 30)
+    text_font = pygame.font.SysFont('segoeuisemibold', 20)
 
     howtoplaytext = title_font.render("How to play", True, yellow)
+    tutorialtext1 = text_font.render("To make a point, force your opponent to collide with your path, make them collide with themselves, ", True, white)
+    tutorialtext2= text_font.render("or make them crash into the borders.", True, white)
     player1name_text = playername_font.render(player1name, True, orange)
     player2name_text = playername_font.render(player2name, True, blue)
 
     textRecthowtoplay = howtoplaytext.get_rect()
-    textRecthowtoplay.center = width / 2, height / 4
+    textRecthowtoplay.center = width / 2, height / 8
 
     textRectplayer1name=player1name_text.get_rect()
-    textRectplayer1name.center=width/4,height/4+100
+    textRectplayer1name.center=width/4,height/4+120
 
     textRectplayer2name=player2name_text.get_rect()
-    textRectplayer2name.center=width/4*3,height/4+100
+    textRectplayer2name.center=width/4*3,height/4+120
+
+    textRecttutorialtext1=tutorialtext1.get_rect()
+    textRecttutorialtext1.center=width/2,height/8+75
+
+    textRecttutorialtext2=tutorialtext2.get_rect()
+    textRecttutorialtext2.center=width/2,height/8+100
 
     display.blit(howtoplaytext, textRecthowtoplay)
     display.blit(player1name_text, textRectplayer1name)
     display.blit(player2name_text, textRectplayer2name)
+    display.blit(tutorialtext1, textRecttutorialtext1)
+    display.blit(tutorialtext2, textRecttutorialtext2)
 
     display.blit(wasd_img,(width/4-185,height/4*2))
     display.blit(arrowkeys_img,(width/4*3-185,height/4*2))
@@ -547,12 +558,16 @@ def howtoplay_screen():
                 if event.key == pygame.K_ESCAPE:
                     howtoplay = False
                     start=True
+
             #debug
             if event.type == pygame.KEYDOWN:
                 activate_debug_mode(event)
             if debug:
                 debugtools(event)
             #debug end
+        if cross_button.draw(display):
+            howtoplay = False
+            start=True
         pygame.display.update()
     pygame.mouse.set_visible(False)
 
