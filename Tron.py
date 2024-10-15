@@ -50,8 +50,7 @@ highscorename = 'Nobody'
 #debug
 def activate_debug_mode(event):
     global debug
-    pressed_keys = pygame.key.get_pressed()
-    if pressed_keys[pygame.K_d] and pressed_keys[pygame.K_e] and pressed_keys[pygame.K_v]:
+    if event.key == pygame.K_d and event.key == pygame.K_e and event.key == pygame.K_:
         debug =True
         print("Debug Mode: ON")
 
@@ -221,6 +220,7 @@ def drawplayers():
 
 
 def player1movement():
+    #sorce https://www.geeksforgeeks.org/snake-game-in-python-using-pygame-module/
     global player1poshistory, player1dir, player1pos
     pressedkey = pygame.key.get_pressed()
 
@@ -635,6 +635,7 @@ def startscreen():
     pygame.mouse.set_visible(False)
 
 def pause():
+    #sorce https://pythonprogramming.net/pause-game-pygame/
     global paused,debug
     pygame.mouse.set_visible(True)
     display.fill(gray)
@@ -726,8 +727,8 @@ save_highscore()
 pygame.quit()
 sys.exit()
 
-#make a how to play site
 
-#Quelllen: Pygame documentation, Stackoverflow, Geeks for geeks, thepythoncode.com, Reddit
-#https://www.youtube.com/watch?v=G8MYGDf_9ho&t=162s
-#https://youtu.be/kDSdjsdoGOY?feature=shared&t=219
+
+#Quelllen: Pygame documentation, Stackoverflow, Geeks for geeks, Reddit
+#rhttps://www.youtube.com/watch?v=G8MYGDf_9ho
+#https://youtu.be/kDSdjsdoGOY?feature=shared&t=89
