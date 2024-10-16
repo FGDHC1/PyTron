@@ -38,7 +38,7 @@ speedup=True
 
 
 #display conditions
-width, height=1000,700
+width, height=1200,800
 display = pygame.display.set_mode((width,height))
 pygame.display.set_caption('PyTron')
 pygame.mouse.set_visible(True)
@@ -50,7 +50,7 @@ highscorename = 'Nobody'
 #debug
 def activate_debug_mode(event):
     global debug
-    if event.key == pygame.K_d and event.key == pygame.K_e and event.key == pygame.K_:
+    if event.key == pygame.K_d and event.key == pygame.K_e and event.key == pygame.K_v:
         debug =True
         print("Debug Mode: ON")
 
@@ -138,6 +138,9 @@ playerwidth=10
 playerspeed=10
 playerdeath=False
 
+#easteregg
+easteregg=False
+easteregg_count=0
 #round limiter
 no_of_rounds=0
 round_limit=0
@@ -512,6 +515,94 @@ def pausestats():
     display.blit(player2cutoffdeath_text, textRectplayer2cutoffdeath)
     display.blit(player2borderdeath_text, textRectplayer2borderdeath)
 
+def easteregg_screen():
+    global easteregg,start
+    color_index=0
+    rainbow_colors = [
+        (255, 0, 0),
+        (255, 32, 0),
+        (255, 64, 0),
+        (255, 96, 0),
+        (255, 127, 0),
+        (255, 159, 0),
+        (255, 191, 0),
+        (255, 223, 0),
+        (255, 255, 0),
+        (223, 255, 0),
+        (191, 255, 0),
+        (159, 255, 0),
+        (127, 255, 0),
+        (96, 255, 0),
+        (64, 255, 0),
+        (32, 255, 0),
+        (0, 255, 0),
+        (0, 255, 32),
+        (0, 255, 64),
+        (0, 255, 96),
+        (0, 255, 127),
+        (0, 255, 159),
+        (0, 255, 191),
+        (0, 255, 223),
+        (0, 255, 255),
+        (0, 223, 255),
+        (0, 191, 255),
+        (0, 159, 255),
+        (0, 127, 255),
+        (0, 96, 255),
+        (0, 64, 255),
+        (0, 32, 255),
+        (0, 0, 255),
+        (32, 0, 255),
+        (64, 0, 255),
+        (96, 0, 255),
+        (127, 0, 255),
+        (159, 0, 255),
+        (191, 0, 255),
+        (223, 0, 255),
+        (255, 0, 255),
+        (255, 0, 223),
+        (255, 0, 191),
+        (255, 0, 159),
+        (255, 0, 127),
+        (255, 0, 96),
+        (255, 0, 64),
+        (255, 0, 32),
+    ]
+
+    pygame.mouse.set_visible(True)
+    display.fill(gray)
+    title_font = pygame.font.SysFont('segoeuisemibold', 55)
+
+    while easteregg:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    easteregg = False
+                    start=True
+
+            #debug
+            if event.type == pygame.KEYDOWN:
+                activate_debug_mode(event)
+            if debug:
+                debugtools(event)
+            #debug end
+        if color_index == len(rainbow_colors) - 1:
+            color_index = 0
+        else:
+            color_index += 1
+        eastereggtext = title_font.render("Congrats you have found an easteregg!", True, rainbow_colors[color_index])
+        textRecteasteregg = eastereggtext.get_rect()
+        textRecteasteregg.center = width / 2, height / 2
+        pygame.time.wait(20)
+        display.blit(eastereggtext, textRecteasteregg)
+        if cross_button.draw(display):
+            easteregg = False
+            start=True
+        pygame.display.update()
+    pygame.mouse.set_visible(False)
 def howtoplay_screen():
     global howtoplay,start
     pygame.mouse.set_visible(True)
@@ -572,7 +663,7 @@ def howtoplay_screen():
     pygame.mouse.set_visible(False)
 
 def startscreen():
-    global start,player1name,player2name,round_limit,roundcounting,debug,howtoplay
+    global start,player1name,player2name,round_limit,roundcounting,debug,howtoplay,easteregg_count,easteregg
     display.fill(gray)
     pygame.mouse.set_visible(True)
 
@@ -627,7 +718,12 @@ def startscreen():
         if howtoplay_button.draw(display):
             start=False
             howtoplay=True
-
+        if title_frame.draw(display):
+            if easteregg_count==2:
+                start=False
+                easteregg=True
+            else:
+                easteregg_count+=1
         title_frame.draw(display)
         manager.draw_ui(display)
         pygame.display.update()
@@ -700,7 +796,8 @@ while running:
     playernames()
     roundlimter()
 
-
+    if easteregg:
+        easteregg_screen()
     if playerdeath:
         show_roundwinner(start_time)
         pygame.display.update()

@@ -18,11 +18,12 @@ Pytron is a pyton version of the arcade game tron with some extra features.
     - Chooseable Playernames
     - Chooseable amount of rounds
     - Score counter
-    - Speedup
+    - The game gets faster on death
+    - Main menu
     - Pause menu
     - Death-stats
-    - Stored Highscore
-    - Buttons
+    - Permanent stored Highscore
+    - Little easteregg to discover
 
 
 ## Installation
