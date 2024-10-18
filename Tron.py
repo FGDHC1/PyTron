@@ -47,7 +47,40 @@ pygame.mouse.set_visible(True)
 highscore = 0
 highscorename = 'Nobody'
 
+#gamespeed
+gamespeed=20
+
+#FPS
+clock = pygame.time.Clock()
+
+#Debug
+debug=False
+
+#Playerstatus
+player1name="Player1"
+player2name="Player2"
+player1score=0
+player2score=0
+
+playerwidth=10
+playerspeed=10
+playerdeath=False
+
+#easteregg
+easteregg=False
+easteregg_count=0
+#round limiter
+no_of_rounds=0
+round_limit=0
+roundcounting=False
+
+#gamestatus
+paused=False
+running=True
+start=True
+howtoplay=False
 #debug
+
 def activate_debug_mode(event):
     global debug
     if event.key == pygame.K_d and event.key == pygame.K_e and event.key == pygame.K_v:
@@ -119,38 +152,7 @@ def debugtools(event):
 
 #debug end
 
-#gamespeed
-gamespeed=20
 
-#FPS
-clock = pygame.time.Clock()
-
-#Debug
-debug=False
-
-#Playerstatus
-player1name="Player1"
-player2name="Player2"
-player1score=0
-player2score=0
-
-playerwidth=10
-playerspeed=10
-playerdeath=False
-
-#easteregg
-easteregg=False
-easteregg_count=0
-#round limiter
-no_of_rounds=0
-round_limit=0
-roundcounting=False
-
-#gamestatus
-paused=False
-running=True
-start=True
-howtoplay=False
 
 #pygame_gui manager and Textfields
 manager=pygame_gui.UIManager((width,height))
