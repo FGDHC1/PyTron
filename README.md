@@ -31,8 +31,8 @@ Pytron is a pyton version of the arcade game tron with some extra features.
 1. Download PyTron with git
 
 ```bash
-   git clone https://git.bbcag.ch/inf-bl/st-gallen/2024/106-inf-datenbanken/sbrunf/pytron.git
-   cd pytron
+git clone https://git.bbcag.ch/inf-bl/st-gallen/2024/106-inf-datenbanken/sbrunf/pytron.git
+cd pytron
 ```
 2. Install the necessary tools
 ```bash
