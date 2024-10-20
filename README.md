@@ -28,7 +28,7 @@ Pytron is a python version of the arcade game tron with some extra features.
 
 ## Installation
 
-This game requires Python 3.x and has been tested only on Windows.
+### **This game requires Python 3.x and has been tested only on Windows!**
 1. Download PyTron with git
 
 ```bash
