@@ -11,7 +11,7 @@
 ```
 # PyTron
 
-Pytron is a pyton version of the arcade game tron with some extra features.
+Pytron is a python version of the arcade game tron with some extra features.
 
 
 ## Features
@@ -28,6 +28,7 @@ Pytron is a pyton version of the arcade game tron with some extra features.
 
 ## Installation
 
+### **This game requires Python 3.x and has been tested only on Windows!**
 1. Download PyTron with git
 
 ```bash
@@ -42,7 +43,10 @@ pip install pygame pygame_gui
 ```bash
 python Tron.py
 ```
-
+## Preview
+![Startscreen](assets/Startscreen.png)
+![Gameplay](assets/Gameplay.png)
+![Pause](assets/Pausemenu.png)
 
 ## Authors
 
