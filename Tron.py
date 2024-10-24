@@ -5,6 +5,9 @@ import pygame_gui
 
 pygame.init()
 
+#Debug
+debug=False #set to True if you want to enable DevMode
+
 #colors
 white=(255,255,255)
 black=(0,0,0)
@@ -29,12 +32,9 @@ player2borderdeath=0
 player1died=False
 player2died=False
 
-#displaytime
-start_time=pygame.time.get_ticks()
 
 #speedup
 speedup=True
-
 
 
 #display conditions
@@ -53,8 +53,6 @@ gamespeed=20
 #FPS
 clock = pygame.time.Clock()
 
-#Debug
-debug=False
 
 #Playerstatus
 player1name="Player1"
@@ -83,7 +81,7 @@ howtoplay=False
 
 def activate_debug_mode(event):
     global debug
-    if event.key == pygame.K_d and event.key == pygame.K_e and event.key == pygame.K_v:
+    if event.key == pygame.K_d and event.key == pygame.K_e and event.key == pygame.K_v or debug==True:
         debug =True
         print("Debug Mode: ON")
 
@@ -152,7 +150,10 @@ def debugtools(event):
 
 #debug end
 
-
+#Backgrounds
+background = pygame.Surface(display.get_size())
+background = background.convert()
+background.fill(black)
 
 #pygame_gui manager and Textfields
 manager=pygame_gui.UIManager((width,height))
@@ -190,10 +191,8 @@ def retrogrid (surface, gridcolor, gridsize):
     for y in range(0, height, gridsize):
         pygame.draw.line(surface, gridcolor, (0,y), (width,y))
 
-background = pygame.Surface(display.get_size())
-background = background.convert()
-background.fill(black)
-retrogrid(background, purple, 40)
+
+
 
 def drawbackground():
     global background
@@ -227,6 +226,7 @@ def drawplayers():
 def player1movement():
     #sorce https://www.geeksforgeeks.org/snake-game-in-python-using-pygame-module/
     global player1poshistory, player1dir, player1pos
+    global player2poshistory, player2dir, player2pos
     pressedkey = pygame.key.get_pressed()
 
     #Key scan
@@ -386,6 +386,16 @@ def load_highscore():
         highscore, highscorename = 0, 'Nobody'
 
 
+def numberfilter(input_string):
+    global roundcounting
+    filtered =''.join(filter(str.isdigit, input_string))
+    if filtered=="":
+        roundcounting=False
+        return None
+    else:
+        return int(filtered)
+
+
 def roundlimter():
     global roundcounting,no_of_rounds,round_limit,paused
     if roundcounting:
@@ -395,14 +405,7 @@ def roundlimter():
             paused=True
 
 
-def numberfilter(input_string):
-        filtered =''.join(filter(str.isdigit, input_string))
-        if filtered=="":
-            pass
-        else:
-            return int(filtered)
-
-def show_roundwinner(start_time):
+def show_roundwinner():
     global player1died, player2died
     font = pygame.font.SysFont('segoeuisemibold', 50)
 
@@ -605,6 +608,7 @@ def easteregg_screen():
             start=True
         pygame.display.update()
     pygame.mouse.set_visible(False)
+
 def howtoplay_screen():
     global howtoplay,start
     pygame.mouse.set_visible(True)
@@ -690,8 +694,9 @@ def startscreen():
 
             #roundlimiting
             if event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED and event.ui_element == roundLimitField:
-                round_limit = numberfilter(event.text)
                 roundcounting=True
+                round_limit = numberfilter(event.text)
+
 
             #debug
             if event.type == pygame.KEYDOWN:
@@ -729,7 +734,8 @@ def startscreen():
         title_frame.draw(display)
         manager.draw_ui(display)
         pygame.display.update()
-    round_limit = int(round_limit)
+    if round_limit is not None:
+        round_limit = int(round_limit)
     pygame.mouse.set_visible(False)
 
 def pause():
@@ -772,7 +778,7 @@ def pause():
     pygame.mouse.set_visible(False)
 
 #main loop
-
+retrogrid(background, purple, 40)
 load_highscore()
 startscreen()
 playerreset()
@@ -785,8 +791,8 @@ while running:
                 paused=True
             #debug
             activate_debug_mode(event)
-    if debug:
-        debugtools(event)
+        if debug:
+            debugtools(event)
             #debug end
     display.blit(background, (0, 0))
     drawplayers()
@@ -801,7 +807,7 @@ while running:
     if easteregg:
         easteregg_screen()
     if playerdeath:
-        show_roundwinner(start_time)
+        show_roundwinner()
         pygame.display.update()
 
     if howtoplay:
