@@ -52,6 +52,9 @@ python Tron.py
 
 - [@sbrunf](https://git.bbcag.ch/sbrunf)
 
+## Thanks to
+- [@smathb](https://git.bbcag.ch/smathb) for helping with the PowerPoint.
+
 ## Sources
 - [Pygame documentation](https://www.pygame.org/docs/)
 - [How to make a Pause funtion](https://pythonprogramming.net/pause-game-pygame/)
