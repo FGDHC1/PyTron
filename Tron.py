@@ -11,9 +11,7 @@ for package in required_packages:
         print(f"Installing {package}...")
         install_package(package)
 
-import button
-import pygame
-import pygame_gui
+import button, pygame, pygame_gui
 
 pygame.init()
 
