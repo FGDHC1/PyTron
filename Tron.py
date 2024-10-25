@@ -1,6 +1,18 @@
-import pygame
-import sys
+import subprocess, sys
+
+def install_package(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+required_packages = ['pygame', 'pygame_gui']
+for package in required_packages:
+    try:
+        __import__(package)
+    except ImportError:
+        print(f"Installing {package}...")
+        install_package(package)
+
 import button
+import pygame
 import pygame_gui
 
 pygame.init()
