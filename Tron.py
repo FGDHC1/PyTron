@@ -1,15 +1,17 @@
 import subprocess, sys
 
-def install_package(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+# (pip-Name, import-Name)
+required_packages = [
+    ('pygame-ce', 'pygame'),
+    ('pygame_gui', 'pygame_gui'),
+]
 
-required_packages = ['pygame', 'pygame_gui']
-for package in required_packages:
+for pip_name, import_name in required_packages:
     try:
-        __import__(package)
+        __import__(import_name)
     except ImportError:
-        print(f"Installing {package}...")
-        install_package(package)
+        print(f"Installing {pip_name}...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", pip_name])
 
 import button, pygame, pygame_gui
 
